@@ -1,0 +1,55 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: api-gateway
+  
+  cloud:
+    gateway:
+      routes:
+        # Product Service Routes
+        - id: product-service
+          uri: ${PRODUCT_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/products/**
+          filters:
+            - StripPrefix=0
+        
+        # Order Service Routes
+        - id: order-service
+          uri: ${ORDER_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/orders/**
+          filters:
+            - StripPrefix=0
+      
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URL:http://localhost:8180}/realms/${KEYCLOAK_REALM:microservices-realm}
+          jwk-set-uri: ${KEYCLOAK_JWK_URL:http://localhost:8180}/realms/${KEYCLOAK_REALM:microservices-realm}/protocol/openid-connect/certs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.company.gateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
