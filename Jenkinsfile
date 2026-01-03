@@ -57,8 +57,9 @@ pipeline{
                     dependencyCheck additionalArguments: '''
                         --project frontend
                         --scan .
-                        --format XML
+                        --format JSON
                         --format HTML
+                        --format XML
                         --out .
                     ''', nvdApiKeyCredentialsId: 'nvd-api-key', odcInstallation: 'dependecy-check'
                     
@@ -68,7 +69,8 @@ pipeline{
                         sh """
                         ${SCANNER_HOME}/bin/sonar-scanner \
                             -Dsonar.projectKey=frontend \
-                            -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml
+                            -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
+                            -Dsonar.dependencyCheck.htmlReportPath=dependency-check-report.html
                         """
                     }
                 }
