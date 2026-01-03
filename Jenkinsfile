@@ -32,9 +32,13 @@ pipeline{
                                 org.owasp:dependency-check-maven:check \
                                 sonar:sonar \
                                 -Dsonar.projectKey=${service} \
-                                -Dsonar.dependencyCheck.xmlReportPath=target/dependency-check-report.xml
+                                -Dsonar.dependencyCheck.jsonReportPath=target/dependency-check-report.json \
+                                -Dsonar.dependencyCheck.htmlReportPath=target/dependency-check-report.html
                                 """
                             }
+                            
+                            // Publish to Jenkins dashboard
+                            dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
                         }
                         echo "Completed SonarQube scan for ${service}."
                     }

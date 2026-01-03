@@ -152,6 +152,11 @@
                 <artifactId>dependency-check-maven</artifactId>
                 <configuration>
                     <nvdApiKey>1a870000-7e8f-41de-b71d-a320fe5fa56c</nvdApiKey>
+                    <formats>
+                        <format>HTML</format>
+                        <format>JSON</format>
+                        <format>XML</format>
+                    </formats>
                 </configuration>
             </plugin> 
             
