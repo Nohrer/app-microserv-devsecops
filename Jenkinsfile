@@ -47,13 +47,24 @@ pipeline{
                     echo "Scanning frontend with SonarQube..."
             
                 dir('frontend') {
-                    sh 'pwd'
                     sh 'npm ci'
-                    sh 'npm audit --audit-level=high --production || true'
+                    sh 'npm audit --audit-level=high --omit=dev || true'
+                    
+                    dependencyCheck additionalArguments: '''
+                        --project frontend
+                        --scan .
+                        --format XML
+                        --format HTML
+                        --out .
+                    ''', odcInstallation: 'dependecy-check'
+                    
+                    dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                    
                     withSonarQubeEnv('sonar-server') {
                         sh """
                         ${SCANNER_HOME}/bin/sonar-scanner \
                             -Dsonar.projectKey=frontend \
+                            -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml
                         """
                     }
                 }
