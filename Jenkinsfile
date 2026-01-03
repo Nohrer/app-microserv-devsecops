@@ -41,6 +41,24 @@ pipeline{
                 }
             }
         }
+        stage("Front end Sonnar Scan & Dependency Check"){
+            steps{
+                script {
+                    echo "Scanning frontend with SonarQube..."
+            
+                dir('frontend') {
+                    sh 'npm ci'
+                    sh 'npm audit --audit-level=high --production || true'
+                    withSonarQubeEnv('sonar-server') {
+                        sh """
+                        ${SCANNER_HOME}/bin/sonar-scanner \
+                            -Dsonar.projectKey=frontend \
+                        """
+                    }
+                }
+            }
+            }
+        }
         stage('Quality Gate') {
             steps {
                 // This pauses the pipeline until SonarQube finishes processing
