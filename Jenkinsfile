@@ -47,6 +47,7 @@ pipeline{
                     echo "Scanning frontend with SonarQube..."
             
                 dir('frontend') {
+                    sh 'pwd'
                     sh 'npm ci'
                     sh 'npm audit --audit-level=high --production || true'
                     withSonarQubeEnv('sonar-server') {
