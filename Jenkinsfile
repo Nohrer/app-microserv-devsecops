@@ -1,0 +1,58 @@
+pipeline{
+    agent any
+    environment {
+       SCANNER_HOME = tool "sonnarScanner"
+    }
+
+    stages {
+        stage('checkout'){
+            checkout scm
+        }
+        stage("Build"){
+            steps{
+                sh 'echo "Building the docker images..."'
+                sh 'docker-compose build'
+
+            }
+        }
+        def services=['api-gateway','product-service','order-service']
+        stage("Sonnar Scan & Dependency Check"){
+            steps{
+                services.each { service ->
+                    echo "Scanning ${service} with SonarQube..."
+                    dir(service){
+                    withSonarQubeEnv('sonar-server'){
+                        sh """
+                        mvn clean verify \
+                        org.owasp:dependency-check-maven:check \
+                        sonar:sonar \
+                        -Dsonar.projectKey=${service} \
+                        -Dsonar.dependencyCheck.xmlReportPath=target/dependency-check-report.xml
+                        """
+                }
+                    echo "Completed SonarQube scan for ${service}."
+                    }
+                }}
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                // This pauses the pipeline until SonarQube finishes processing
+                // If the Quality Gate fails (e.g., bugs found), the pipeline aborts here.
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        failure {
+            echo 'Pipeline failed. Please check SonarQube report.'
+        }
+    }
+    
