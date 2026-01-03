@@ -6,7 +6,9 @@ pipeline{
 
     stages {
         stage('checkout'){
-            checkout scm
+            steps{
+                checkout scm
+            }
         }
         stage("Build"){
             steps{
@@ -18,21 +20,26 @@ pipeline{
         def services=['api-gateway','product-service','order-service']
         stage("Sonnar Scan & Dependency Check"){
             steps{
-                services.each { service ->
-                    echo "Scanning ${service} with SonarQube..."
-                    dir(service){
-                    withSonarQubeEnv('sonar-server'){
-                        sh """
-                        mvn clean verify \
-                        org.owasp:dependency-check-maven:check \
-                        sonar:sonar \
-                        -Dsonar.projectKey=${service} \
-                        -Dsonar.dependencyCheck.xmlReportPath=target/dependency-check-report.xml
-                        """
-                }
-                    echo "Completed SonarQube scan for ${service}."
+                script {
+                    def services = ['api-gateway', 'product-service', 'order-service']
+                    
+                    services.each { service ->
+                        echo "Scanning ${service} with SonarQube..."
+                        
+                        dir(service) {
+                            withSonarQubeEnv('sonar-server') {
+                                sh """
+                                mvn clean verify \
+                                org.owasp:dependency-check-maven:check \
+                                sonar:sonar \
+                                -Dsonar.projectKey=${service} \
+                                -Dsonar.dependencyCheck.xmlReportPath=target/dependency-check-report.xml
+                                """
+                            }
+                        }
+                        echo "Completed SonarQube scan for ${service}."
                     }
-                }}
+                }
             }
         }
         stage('Quality Gate') {
@@ -44,10 +51,7 @@ pipeline{
                 }
             }
         }
-
-    }
-
-    post {
+          post {
         always {
             cleanWs()
         }
@@ -55,4 +59,8 @@ pipeline{
             echo 'Pipeline failed. Please check SonarQube report.'
         }
     }
+
+    }
+
+  
     
