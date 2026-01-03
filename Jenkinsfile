@@ -54,15 +54,13 @@ pipeline{
                     sh 'npm ci'
                     sh 'npm audit --audit-level=high --omit=dev || true'
                     
-                    withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
-                        dependencyCheck additionalArguments: '''
-                            --project frontend
-                            --scan .
-                            --format XML
-                            --format HTML
-                            --out .
-                        ''', nvdApiKeyCredentialsId: 'nvd-api-key', odcInstallation: 'dependecy-check'
-                    }
+                    dependencyCheck additionalArguments: '''
+                        --project frontend
+                        --scan .
+                        --format XML
+                        --format HTML
+                        --out .
+                    ''', nvdApiKeyCredentialsId: 'nvd-api-key', odcInstallation: 'dependecy-check'
                     
                     dependencyCheckPublisher pattern: 'dependency-check-report.xml'
                     
