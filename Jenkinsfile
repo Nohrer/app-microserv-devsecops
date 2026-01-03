@@ -17,7 +17,6 @@ pipeline{
 
             }
         }
-        def services=['api-gateway','product-service','order-service']
         stage("Sonnar Scan & Dependency Check"){
             steps{
                 script {
