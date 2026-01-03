@@ -50,7 +50,9 @@ pipeline{
                 }
             }
         }
-          post {
+
+    }
+    post {
         always {
             cleanWs()
         }
@@ -58,6 +60,5 @@ pipeline{
             echo 'Pipeline failed. Please check SonarQube report.'
         }
     }
-
-    }
 }
+
