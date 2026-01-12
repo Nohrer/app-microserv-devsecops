@@ -2,6 +2,7 @@ pipeline{
     agent any
     environment {
        SCANNER_HOME = tool "sonnarScanner"
+         COMPOSE_PROJECT_NAME = 'ci'
     }
 
     stages {
@@ -15,6 +16,30 @@ pipeline{
                 sh 'echo "Building the docker images..."'
                 sh 'docker compose build'
 
+            }
+        }
+        stage('Trivy Image Scan'){
+            steps{
+                script {
+                    def services = ['api-gateway', 'product-service', 'order-service', 'frontend']
+
+                    sh 'mkdir -p trivy-reports'
+
+                    services.each { service ->
+                        echo "Trivy image scan for ${service}..."
+                        sh """
+                        docker run --rm \
+                          -v /var/run/docker.sock:/var/run/docker.sock \
+                          -v \$HOME/.cache/trivy:/root/.cache/ \
+                          aquasec/trivy:latest image --no-progress --ignore-unfixed \
+                          --exit-code 1 --severity HIGH,CRITICAL \
+                          --format json --output trivy-reports/${service}-image.json \
+                          \$COMPOSE_PROJECT_NAME-${service}
+                        """
+                    }
+
+                    archiveArtifacts artifacts: 'trivy-reports/*.json', fingerprint: true
+                }
             }
         }
         stage("Sonnar Scan & Dependency Check"){
