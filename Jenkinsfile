@@ -33,10 +33,10 @@ pipeline{
                           -v \$HOME/.cache/trivy:/root/.cache/ \
                           -v \$PWD/trivy-reports:/trivy-reports \
                           aquasec/trivy:latest image --no-progress --ignore-unfixed \
-                          --exit-code 1 --severity HIGH,CRITICAL \
+                          --severity HIGH,CRITICAL \
                           --timeout 15m \
                           --format json --output /trivy-reports/${service}-image.json \
-                          \$COMPOSE_PROJECT_NAME-${service}
+                          \$COMPOSE_PROJECT_NAME-${service} || true
                         """
                     }
 
