@@ -31,9 +31,11 @@ pipeline{
                         docker run --rm \
                           -v /var/run/docker.sock:/var/run/docker.sock \
                           -v \$HOME/.cache/trivy:/root/.cache/ \
+                          -v \$PWD/trivy-reports:/trivy-reports \
                           aquasec/trivy:latest image --no-progress --ignore-unfixed \
                           --exit-code 1 --severity HIGH,CRITICAL \
-                          --format json --output trivy-reports/${service}-image.json \
+                          --timeout 15m \
+                          --format json --output /trivy-reports/${service}-image.json \
                           \$COMPOSE_PROJECT_NAME-${service}
                         """
                     }
