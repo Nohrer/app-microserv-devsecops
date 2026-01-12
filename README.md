@@ -733,22 +733,22 @@ User      Frontend    API Gateway  Order Service  Product Service
   | Add Cart  |            |            |              |
   |---------->|            |            |              |
   |           |            |            |              |
-  | Place Order|POST /orders + JWT     |              |
-  |---------->|---------->| Validate   |              |
-  |           |           | JWT        |              |
-  |           |           |---------->| Check Stock   |
-  |           |           |           |------------>|
-  |           |           |           | Stock OK   |
-  |           |           |           |<-----------|
-  |           |           |           | Reduce Stock|
-  |           |           |           |------------>|
-  |           |           |           | Done       |
-  |           |           |           |<-----------|
-  |           |           | Save Order|              |
-  |           |<----------|<---------|              |
-  |           | Order OK  |            |              |
-  |<----------|           |            |              |
-  |           |           |            |              |
+  | Place Order|POST /orders + JWT      |              |
+  |---------->|----------> | Validate   |              |
+  |           |            | JWT        |              |
+  |           |            |----------> | Check Stock  |
+  |           |            |            |------------->|
+  |           |            |            | Stock OK     |
+  |           |            |            |<-------------|
+  |           |            |            | Reduce Stock |
+  |           |            |            |------------->|
+  |           |            |            | Done         |
+  |           |            |            |<-------------|
+  |           |            | Save Order |              |
+  |           |<-----------|<-----------|              |
+  |           | Order OK   |            |              |
+  |<----------|            |            |              |
+  |           |            |            |              |
 ```
 
 ## Troubleshooting
